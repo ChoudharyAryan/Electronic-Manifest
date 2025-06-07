@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:manifest/addclass_popup.dart';
@@ -37,7 +36,7 @@ class _ManifestPageState extends State<ManifestPage> {
         onPressed: () async {
           final dynamic response;
           response = await addClassPopup(context);
-          classRepo.addClass(response);
+          if (response != null) classRepo.addClass(response);
         },
         child: const FaIcon(FontAwesomeIcons.plus),
       ),

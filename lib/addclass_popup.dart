@@ -1,6 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:manifest/addclass_textfield.dart';
+import 'package:manifest/cupertino_button.dart';
+import 'package:manifest/snackbar.dart';
+import 'package:manifest/url_checker.dart';
 
 Future<Map<String, String>?> addClassPopup(BuildContext context) async {
   TextEditingController name = TextEditingController();
@@ -66,32 +68,21 @@ Future<Map<String, String>?> addClassPopup(BuildContext context) async {
               ),
             ),
             actions: [
-              CupertinoButton(
-                onPressed: () {
-                  Navigator.of(context)
-                      .pop(null); // Close dialog without saving
-                },
-                child: const Text(
-                  "Cancel",
-                ),
-              ),
-              CupertinoButton(
+              customCupertinoButton(
+                  text: 'Cancel',
+                  onPressed: () => Navigator.of(context).pop(null)),
+              customCupertinoButton(
+                text: 'Submit',
                 onPressed: () {
                   if (name.text.isEmpty || imageUrl.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Please fill all required fields"),
-                      ),
-                    );
+                    showCustomSnackBar(
+                        context: context,
+                        message: 'please fill the required fields');
                     return;
                   }
-                  if (!Uri.tryParse(imageUrl.text.trim())!.hasAbsolutePath ??
-                      false) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Please enter a valid URL"),
-                      ),
-                    );
+                  if (isValidUrl(imageUrl.text)) {
+                    showCustomSnackBar(
+                        context: context, message: 'please enter a valid url');
                     return;
                   }
                   Navigator.of(context).pop({
@@ -101,7 +92,6 @@ Future<Map<String, String>?> addClassPopup(BuildContext context) async {
                     "is_consumable": isConsumable.toString(),
                   });
                 },
-                child: const Text("Submit"),
               )
             ],
           );
