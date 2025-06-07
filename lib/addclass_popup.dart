@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:manifest/addclass_textfield.dart';
 
-Future<Map<String, String>?> addClass(BuildContext context) async {
+Future<Map<String, String>?> addClassPopup(BuildContext context) async {
   TextEditingController name = TextEditingController();
   TextEditingController description = TextEditingController();
   TextEditingController imageUrl = TextEditingController();
@@ -98,7 +98,7 @@ Future<Map<String, String>?> addClass(BuildContext context) async {
                     "name": name.text.trim(),
                     "description": description.text.trim(),
                     "image": imageUrl.text.trim(),
-                    "isConsumable": isConsumable.toString(),
+                    "is_consumable": isConsumable.toString(),
                   });
                 },
                 child: const Text("Submit"),

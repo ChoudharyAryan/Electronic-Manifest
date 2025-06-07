@@ -15,11 +15,25 @@ class ClassRepo {
       }
       return myClasses;
     } catch (e) {
-      log('THIS IS THE ERROR IN CLASSREPO.DART FILE');
+      log('this is the error in the fetchClasses function in class_repo.dart ${e.toString()}');
       log(e.toString());
       return [];
     }
   }
 
-  void addClass(Map data){}
+  void addClass(Map<String, dynamic> data) async {
+    try {
+      final response = await Supabase.instance.client
+          .from('categories')
+          .insert(data)
+          .select();
+      if (response.isEmpty) {
+        log("Error: No data returned from the insert operation.");
+      } else {
+        log("Data inserted successfully: $response");
+      }
+    } catch (e) {
+      log("this is the error in the addClass function in class_repo.dart ${e.toString()}");
+    }
+  }
 }

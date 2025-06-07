@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -37,8 +36,8 @@ class _ManifestPageState extends State<ManifestPage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         onPressed: () async {
           final dynamic response;
-          response = await addClass(context);
-          
+          response = await addClassPopup(context);
+          classRepo.addClass(response);
         },
         child: const FaIcon(FontAwesomeIcons.plus),
       ),
