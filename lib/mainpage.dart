@@ -4,6 +4,7 @@ import 'package:manifest/addclass_popup.dart';
 import 'package:manifest/class_box.dart';
 import 'package:manifest/class_model.dart';
 import 'package:manifest/class_repo.dart';
+import 'package:manifest/isconsumable_slider.dart';
 
 class ManifestPage extends StatefulWidget {
   final String title;
@@ -16,9 +17,14 @@ class ManifestPage extends StatefulWidget {
 class _ManifestPageState extends State<ManifestPage> {
   final ClassRepo classRepo = ClassRepo();
   List<Class> classes = [];
-  void fetchClasses() async {
-    classes = await classRepo.fetchClasses();
-    setState(() {});
+  bool isLoading = false;
+  bool isConsumable = true;
+
+  // Function to fetch classes from Supabase
+  Future<void> fetchClasses({bool isConsumable = true}) async {
+    setState(() => isLoading = true); // Start loading
+    classes = await classRepo.fetchClasses(isConsumable: isConsumable);
+    setState(() => isLoading = false); // End loading
   }
 
   @override
@@ -37,6 +43,7 @@ class _ManifestPageState extends State<ManifestPage> {
           final dynamic response;
           response = await addClassPopup(context);
           if (response != null) classRepo.addClass(response);
+          fetchClasses(isConsumable: isConsumable);
         },
         child: const FaIcon(FontAwesomeIcons.plus),
       ),
@@ -63,17 +70,29 @@ class _ManifestPageState extends State<ManifestPage> {
         child: Center(
           child: Column(
             children: [
+              IsconsumableSlider(
+                isConsumable: isConsumable,
+                onToggle: (bool value) {
+                  setState(() {
+                    isConsumable = value;
+                  });
+                  fetchClasses(isConsumable: isConsumable);
+                },
+              ),
               Expanded(
                 child: classes.isEmpty
-                    ? const Center(
-                        child: SizedBox(
-                            child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator.adaptive(),
-                      )))
+                    ? isLoading
+                        ? const Center(
+                            child: SizedBox(
+                                child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: CircularProgressIndicator.adaptive(),
+                          ))) // Loading state
+                        : const Text("No classes available") // No data state
                     : Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: GridView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,

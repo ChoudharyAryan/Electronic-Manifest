@@ -3,10 +3,18 @@ import 'package:manifest/class_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ClassRepo {
-  Future<List<Class>> fetchClasses() async {
+  Future<List<Class>> fetchClasses({required bool isConsumable}) async {
     try {
       List<Map> response = [];
-      response = await Supabase.instance.client.from('categories').select('*');
+      response = isConsumable
+          ? await Supabase.instance.client
+              .from('categories')
+              .select('*')
+              .eq('is_consumable', true)
+          : await Supabase.instance.client
+              .from('categories')
+              .select('*')
+              .eq('is_consumable', false);
       List<Class> myClasses = [];
       for (Map myClass in response) {
         if (myClass['name'] != null) {
