@@ -42,8 +42,10 @@ class _ManifestPageState extends State<ManifestPage> {
         onPressed: () async {
           final dynamic response;
           response = await addClassPopup(context);
-          if (response != null) classRepo.addClass(response);
-          fetchClasses(isConsumable: isConsumable);
+          if (response != null) {
+            classRepo.addClass(response);
+            await fetchClasses(isConsumable: isConsumable);
+          }
         },
         child: const FaIcon(FontAwesomeIcons.plus),
       ),
@@ -88,7 +90,12 @@ class _ManifestPageState extends State<ManifestPage> {
                             padding: EdgeInsets.all(8.0),
                             child: CircularProgressIndicator.adaptive(),
                           ))) // Loading state
-                        : const Text("No classes available") // No data state
+                        : const Text(
+                            "No classes available",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ) // No data state
                     : Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: GridView.builder(

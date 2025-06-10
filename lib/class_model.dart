@@ -1,4 +1,3 @@
-
 import 'package:equatable/equatable.dart';
 
 class Class extends Equatable {
@@ -6,33 +5,30 @@ class Class extends Equatable {
   final bool isConsumable;
   final String? description;
   final String imageUrl;
+  final String properties;
 
   const Class(
       {required this.name,
       required this.isConsumable,
       required this.imageUrl,
+      required this.properties,
       this.description});
 
   static const empty = Class(
       name: "-*",
       isConsumable: false,
       description: "-*",
-      imageUrl: "assets/icons/blankImage.png");
+      imageUrl: "assets/icons/blankImage.png",
+      properties: "-*");
 
   static Class fromJson(Map data) {
-    final String url = data['image'];
-    final regExp = RegExp(r'd/([a-zA-Z0-9_-]+)/');
-    final match = regExp.firstMatch(url);
-    if (match != null) {
-      final fileId = match.group(1);
-      data['image'] = 'https://drive.google.com/uc?export=view&id=$fileId';
-    }
-    //log("This is the iamg URL ${data['image'].toString()}");
     return Class(
-        name: "${data['name']}",
-        isConsumable: data['is_consumable'],
-        imageUrl: "${data['image']}",
-        description: "${data['description']}");
+      name: "${data['name']}",
+      isConsumable: data['is_consumable'],
+      imageUrl: "${data['image']}",
+      description: "${data['description']}",
+      properties: "${data['properties']}",
+    );
   }
 
   @override

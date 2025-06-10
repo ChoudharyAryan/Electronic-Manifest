@@ -39,7 +39,7 @@ class _IsconsumableSliderState extends State<IsconsumableSlider> {
         child: Stack(
           children: [
             AnimatedAlign(
-              duration: const Duration(milliseconds: 150),
+              duration: const Duration(milliseconds: 300),
               alignment: selectedIndex == 0
                   ? Alignment.centerLeft
                   : Alignment.centerRight,

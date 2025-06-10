@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+//TODO store all images locally so they do not have to be fetched again and again from google drive.
 
 // class MyHomePage extends StatefulWidget {
 //   const MyHomePage({super.key});

@@ -1,13 +1,22 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:manifest/addclass_textfield.dart';
+import 'package:manifest/class_repo.dart';
 import 'package:manifest/cupertino_button.dart';
+import 'package:manifest/image_picker.dart';
 import 'package:manifest/snackbar.dart';
-import 'package:manifest/url_checker.dart';
+import 'package:manifest/regex_checker.dart';
 
 Future<Map<String, String>?> addClassPopup(BuildContext context) async {
   TextEditingController name = TextEditingController();
   TextEditingController description = TextEditingController();
-  TextEditingController imageUrl = TextEditingController();
+  TextEditingController classProperties = TextEditingController();
+  ClassRepo classRepo = ClassRepo();
+  File? selectedFile;
+  String imageUrl = '';
   bool isConsumable = false;
   return showAdaptiveDialog<Map<String, String>>(
       context: context,
@@ -34,9 +43,9 @@ Future<Map<String, String>?> addClassPopup(BuildContext context) async {
                     height: 12,
                   ),
                   CustomTextField(
-                    controller: imageUrl,
-                    labelText: 'image url',
-                    icon: Icons.link_rounded,
+                    controller: classProperties,
+                    labelText: 'properties',
+                    icon: FontAwesomeIcons.gears,
                     isRequired: true,
                   ),
                   const SizedBox(
@@ -50,6 +59,11 @@ Future<Map<String, String>?> addClassPopup(BuildContext context) async {
                   ),
                   const SizedBox(
                     height: 12,
+                  ),
+                  CustomImagePicker(
+                    onImageSelected: (file) {
+                      selectedFile = file;
+                    },
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -69,28 +83,47 @@ Future<Map<String, String>?> addClassPopup(BuildContext context) async {
             ),
             actions: [
               customCupertinoButton(
-                  text: 'Cancel',
-                  onPressed: () => Navigator.of(context).pop(null)),
+                text: 'Cancel',
+                onPressed: () => Navigator.of(context).pop(null),
+              ),
               customCupertinoButton(
                 text: 'Submit',
-                onPressed: () {
-                  if (name.text.isEmpty || imageUrl.text.isEmpty) {
+                onPressed: () async {
+                  if (name.text.isEmpty ||
+                      selectedFile == null ||
+                      classProperties.text.isEmpty) {
                     showCustomSnackBar(
                         context: context,
                         message: 'please fill the required fields');
                     return;
                   }
-                  if (isValidUrl(imageUrl.text)) {
+                  imageUrl = await classRepo.uploadImage(
+                      name.text, context, selectedFile);
+                  if (imageUrl.isEmpty) {
                     showCustomSnackBar(
-                        context: context, message: 'please enter a valid url');
+                        context: context,
+                        message: 'unable to retrive image from supabase');
                     return;
                   }
-                  Navigator.of(context).pop({
-                    "name": name.text.trim(),
-                    "description": description.text.trim(),
-                    "image": imageUrl.text.trim(),
-                    "is_consumable": isConsumable.toString(),
-                  });
+
+                  if (!isValidProperties(classProperties.text)) {
+                    showCustomSnackBar(
+                        context: context,
+                        message: 'list your properties with commas inbetween');
+                    return;
+                  }
+
+                  Navigator.of(context).pop(
+                    {
+                      "name": name.text.trim(),
+                      "description": description.text.isNotEmpty
+                          ? description.text.trim()
+                          : '',
+                      "image": imageUrl.trim(),
+                      "is_consumable": isConsumable.toString(),
+                      "properties": classProperties.text.replaceAll(' ', ''),
+                    },
+                  );
                 },
               )
             ],
