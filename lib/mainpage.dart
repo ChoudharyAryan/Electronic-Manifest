@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:manifest/addclass_popup.dart';
 import 'package:manifest/class_box.dart';
+import 'package:manifest/class_details_card.dart';
 import 'package:manifest/class_model.dart';
 import 'package:manifest/class_repo.dart';
 import 'package:manifest/isconsumable_slider.dart';
+import 'package:manifest/snackbar.dart';
 
 class ManifestPage extends StatefulWidget {
   final String title;
@@ -43,8 +45,14 @@ class _ManifestPageState extends State<ManifestPage> {
           final dynamic response;
           response = await addClassPopup(context);
           if (response != null) {
-            classRepo.addClass(response);
-            await fetchClasses(isConsumable: isConsumable);
+            try {
+              classRepo.addClass(response);
+              await fetchClasses(isConsumable: isConsumable);
+            } catch (e) {
+              await classRepo.deleteImage(response['image']);
+              showCustomSnackBar(
+                  context: context, message: 'Failed to add class: $e');
+            }
           }
         },
         child: const FaIcon(FontAwesomeIcons.plus),
@@ -108,10 +116,26 @@ class _ManifestPageState extends State<ManifestPage> {
                           ),
                           itemCount: classes.length,
                           itemBuilder: (context, index) {
-                            return classBox(
-                                name: classes[index].name,
-                                url: classes[index].imageUrl,
-                                context: context);
+                            return GestureDetector(
+                              onLongPress: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return ClassDetailsCard(
+                                      imageUrl: classes[index].imageUrl,
+                                      name: classes[index].name,
+                                      description: classes[index].description,
+                                      isConsumable: classes[index].isConsumable,
+                                      properties: classes[index].properties,
+                                    );
+                                  },
+                                );
+                              },
+                              child: classBox(
+                                  name: classes[index].name,
+                                  url: classes[index].imageUrl,
+                                  context: context),
+                            );
                           },
                         ),
                       ),

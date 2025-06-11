@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -18,6 +17,7 @@ Future<Map<String, String>?> addClassPopup(BuildContext context) async {
   File? selectedFile;
   String imageUrl = '';
   bool isConsumable = false;
+  bool isloading = false;
   return showAdaptiveDialog<Map<String, String>>(
       context: context,
       barrierDismissible: true,
@@ -82,50 +82,66 @@ Future<Map<String, String>?> addClassPopup(BuildContext context) async {
               ),
             ),
             actions: [
-              customCupertinoButton(
-                text: 'Cancel',
-                onPressed: () => Navigator.of(context).pop(null),
-              ),
-              customCupertinoButton(
-                text: 'Submit',
-                onPressed: () async {
-                  if (name.text.isEmpty ||
-                      selectedFile == null ||
-                      classProperties.text.isEmpty) {
-                    showCustomSnackBar(
-                        context: context,
-                        message: 'please fill the required fields');
-                    return;
-                  }
-                  imageUrl = await classRepo.uploadImage(
-                      name.text, context, selectedFile);
-                  if (imageUrl.isEmpty) {
-                    showCustomSnackBar(
-                        context: context,
-                        message: 'unable to retrive image from supabase');
-                    return;
-                  }
+              isloading
+                  ? const SizedBox.shrink()
+                  : customCupertinoButton(
+                      text: 'Cancel',
+                      onPressed: () => Navigator.of(context).pop(null),
+                    ),
+              isloading
+                  ? const CircularProgressIndicator.adaptive()
+                  : customCupertinoButton(
+                      text: 'Submit',
+                      onPressed: () async {
+                        try {
+                          setState(() => isloading = true);
+                          if (name.text.isEmpty ||
+                              selectedFile == null ||
+                              classProperties.text.isEmpty) {
+                            showCustomSnackBar(
+                                context: context,
+                                message: 'please fill the required fields');
+                            return;
+                          }
 
-                  if (!isValidProperties(classProperties.text)) {
-                    showCustomSnackBar(
-                        context: context,
-                        message: 'list your properties with commas inbetween');
-                    return;
-                  }
+                          if (!isValidProperties(classProperties.text)) {
+                            showCustomSnackBar(
+                                context: context,
+                                message:
+                                    'list your properties with commas inbetween');
+                            return;
+                          }
 
-                  Navigator.of(context).pop(
-                    {
-                      "name": name.text.trim(),
-                      "description": description.text.isNotEmpty
-                          ? description.text.trim()
-                          : '',
-                      "image": imageUrl.trim(),
-                      "is_consumable": isConsumable.toString(),
-                      "properties": classProperties.text.replaceAll(' ', ''),
-                    },
-                  );
-                },
-              )
+                          imageUrl = await classRepo.uploadImage(
+                              name.text, context, selectedFile);
+                          if (imageUrl.isEmpty) {
+                            showCustomSnackBar(
+                                context: context,
+                                message:
+                                    'unable to retrive image url from supabase');
+                            return;
+                          }
+
+                          Navigator.of(context).pop(
+                            {
+                              "name": name.text.trim(),
+                              "description": description.text.isNotEmpty
+                                  ? description.text.trim()
+                                  : '',
+                              "image": imageUrl.trim(),
+                              "is_consumable": isConsumable.toString(),
+                              "properties":
+                                  classProperties.text.replaceAll(' ', ''),
+                            },
+                          );
+                        } catch (e) {
+                          showCustomSnackBar(
+                              context: context,
+                              message: 'Failed to add class: $e');
+                          return;
+                        }
+                      },
+                    )
             ],
           );
         });
