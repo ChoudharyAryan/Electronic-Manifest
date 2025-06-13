@@ -21,6 +21,7 @@ class ClassRepo {
               .from('categories')
               .select('*')
               .eq('is_consumable', false);
+      log("THIS IS THE CLASSES ${response.toString()}");
       List<Class> myClasses = [];
       for (Map myClass in response) {
         if (myClass['name'] != null) {
@@ -55,9 +56,9 @@ class ClassRepo {
       if (response.isEmpty) {
         log("No files were deleted.");
       } else {
-        response.forEach((fileObject) {
+        for (var fileObject in response) {
           log("Deleted file: ${fileObject.name}");
-        });
+        }
       }
     } catch (e) {
       log("Error deleting image: $e");
@@ -152,5 +153,16 @@ class ClassRepo {
     }
   }
 
-  //Future<void> deleteClass(){}
+  Future<bool> deleteClass(String categoryId) async {
+    // TODO Implement in supabase such that when category row gets deleted the image in storage is also gets deleted
+    final supabase = Supabase.instance.client; //TODO Error handling
+
+    try {
+      await supabase.from('categories').delete().eq('category_id', categoryId);
+      return true;
+    } catch (e) {
+      log("ERROR IN DELETING THE CLASS ${e.toString()}");
+      return false;
+    }
+  }
 }

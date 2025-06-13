@@ -101,6 +101,9 @@ Future<Map<String, String>?> addClassPopup(BuildContext context) async {
                             showCustomSnackBar(
                                 context: context,
                                 message: 'please fill the required fields');
+                            setState(
+                              () => isloading = false,
+                            );
                             return;
                           }
 
@@ -109,6 +112,9 @@ Future<Map<String, String>?> addClassPopup(BuildContext context) async {
                                 context: context,
                                 message:
                                     'list your properties with commas inbetween');
+                            setState(
+                              () => isloading = false,
+                            );
                             return;
                           }
 
@@ -119,6 +125,9 @@ Future<Map<String, String>?> addClassPopup(BuildContext context) async {
                                 context: context,
                                 message:
                                     'unable to retrive image url from supabase');
+                            setState(
+                              () => isloading = false,
+                            );
                             return;
                           }
 
@@ -138,6 +147,9 @@ Future<Map<String, String>?> addClassPopup(BuildContext context) async {
                           showCustomSnackBar(
                               context: context,
                               message: 'Failed to add class: $e');
+                          setState(
+                            () => isloading = false,
+                          );
                           return;
                         }
                       },

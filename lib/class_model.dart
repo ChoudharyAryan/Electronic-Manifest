@@ -1,7 +1,7 @@
-
 import 'package:equatable/equatable.dart';
 
 class Class extends Equatable {
+  final String id;
   final String name;
   final bool isConsumable;
   final String? description;
@@ -13,14 +13,16 @@ class Class extends Equatable {
       required this.isConsumable,
       required this.imageUrl,
       required this.properties,
-      this.description});
+      this.description,
+      required this.id});
 
   static const empty = Class(
       name: "-*",
       isConsumable: false,
       description: "-*",
       imageUrl: "assets/icons/blankImage.png",
-      properties: ["-*"]);
+      properties: ["-*"],
+      id: '-*');
 
   static Class fromJson(Map data) {
     return Class(
@@ -30,10 +32,11 @@ class Class extends Equatable {
       description: "${data['description']}",
       properties:
           "${data['properties']}".split(',').map((e) => e.trim()).toList(),
+      id: '${data['category_id']}',
     );
   }
 
   @override
   List<Object?> get props =>
-      [name, isConsumable, imageUrl, description, properties];
+      [name, isConsumable, imageUrl, description, properties,id];
 }

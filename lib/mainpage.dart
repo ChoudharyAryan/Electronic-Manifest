@@ -127,6 +127,16 @@ class _ManifestPageState extends State<ManifestPage> {
                                       description: classes[index].description,
                                       isConsumable: classes[index].isConsumable,
                                       properties: classes[index].properties,
+                                      classRepo: classRepo,
+                                      id: classes[index].id,
+                                      onClose: (value) async {// TODO Implement Imediate update of classes and removal of deleted classes
+                                        setState(() {});
+                                        value
+                                            ? await classRepo.fetchClasses(
+                                                isConsumable: isConsumable)
+                                            : null;
+                                        //setState(() {});
+                                      },
                                     );
                                   },
                                 );
